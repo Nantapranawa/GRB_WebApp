@@ -1,5 +1,5 @@
 ## Good Reading Bookstore Web Based Application
-Designed for final project of lecture Teknik Basis Data 2023
+Designed for final project of lecture Teknologi Basis Data 2023
 
 ## Getting Started
 
