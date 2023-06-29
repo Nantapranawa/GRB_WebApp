@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model author {
+  AuthorID   Int     @id @default(autoincrement())
+  authorName String  @db.VarChar(50)
+  yearBorn   Int?
+  yearDied   Int?
+  write      write[]
+}
+
+model book {
+  BookID          Int         @id @default(autoincrement())
+  bookName        String      @db.VarChar(50)
+  publicationYear Int?
+  publisherName   String?     @db.VarChar(50)
+  inventory       inventory[]
+  write           write[]
+}
+
+model customer {
+  CustomerID  Int           @id(map: "Customer_pkey")
+  custName    String        @db.VarChar(50)
+  city        String?       @db.VarChar(50)
+  country     String?       @db.VarChar(50)
+  transaction transaction[]
+}
+
+model employee {
+  EmployeeID   Int           @id(map: "Employee_pkey")
+  employeeName String        @db.VarChar(50)
+  position     String?       @db.VarChar(50)
+  storestaffs  storestaffs[]
+}
+
+model inventory {
+  InventoryID Int
+  BookID      Int
+  StoreID     Int
+  lastUpdate  DateTime? @db.Date
+  book        book      @relation(fields: [BookID], references: [BookID], onDelete: NoAction, onUpdate: NoAction, map: "BookID")
+  store       store     @relation(fields: [StoreID], references: [StoreID], onDelete: NoAction, onUpdate: NoAction, map: "StoreID")
+
+  @@id([InventoryID, BookID, StoreID], map: "Inventory_pkey")
+}
+
+model publisher {
+  publisherID   Int     @id(map: "Publisher_pkey")
+  publisherName String  @db.VarChar(50)
+  city          String? @db.VarChar(50)
+  country       String? @db.VarChar(50)
+  telephone     String? @db.VarChar(20)
+  yearFounded   Int?
+}
+
+model store {
+  StoreID     Int           @id(map: "Store_pkey")
+  storeName   String        @db.VarChar(50)
+  city        String?       @db.VarChar(50)
+  telephone   String?       @db.VarChar(20)
+  inventory   inventory[]
+  storestaffs storestaffs[]
+}
+
+model storestaffs {
+  StoreID    Int
+  EmployeeID Int
+  employee   employee @relation(fields: [EmployeeID], references: [EmployeeID], onDelete: NoAction, onUpdate: NoAction, map: "EmployeeID")
+  store      store    @relation(fields: [StoreID], references: [StoreID], onDelete: NoAction, onUpdate: NoAction, map: "StoreID")
+
+  @@id([StoreID, EmployeeID], map: "StoreStaffs_pkey")
+}
+
+model transaction {
+  TransactionID Int
+  CustomerID    Int
+  BookID        Int
+  price         Int?
+  date          DateTime? @db.Date
+  quantity      Int?
+  customer      customer  @relation(fields: [CustomerID], references: [CustomerID], onDelete: NoAction, onUpdate: NoAction, map: "CustomerID")
+
+  @@id([CustomerID, BookID, TransactionID], map: "Transaction_pkey")
+}
+
+model write {
+  AuthorID Int
+  BookID   Int
+  author   author @relation(fields: [AuthorID], references: [AuthorID], onDelete: NoAction, onUpdate: NoAction, map: "AuthorID")
+  book     book   @relation(fields: [BookID], references: [BookID], onDelete: NoAction, onUpdate: NoAction, map: "BookID")
+
+  @@id([AuthorID, BookID], map: "Write_pkey")
+}
